@@ -19,14 +19,31 @@ module.exports = function(grunt) {
      },
 
      srcmust: {
+        options: {
+          type: 'rename'
+        },
         contact: {
           options: {
             cssdir: 'release/css/',
-            jsdir: 'release/js/contact/'
+            jsdir: 'release/js/contact/',
+            imagesdir: 'release/css/images/'
           },
           files: [
             {
               src: 'pim/contact.jsp'
+            }
+          ]
+        },
+
+        sms: {
+           options: {
+            cssdir: 'release/css/',
+            jsdir: 'release/js/sms/',
+            imagesdir: 'release/css/images/'
+          },
+          files: [
+            {
+              src: 'pim/sms.jsp'
             }
           ]
         }

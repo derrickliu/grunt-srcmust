@@ -1,7 +1,7 @@
 {
   "name": "grunt-srcmust",
   "description": "resource in page cache control",
-  "version": "0.1.1",
+  "version": "0.1.8",
   "homepage": "https://github.com/derrickliu/grunt-srcmust",
   "author": {
     "name": "derrickliu",
@@ -30,7 +30,10 @@
     "grunt": "~0.4.5"
   },
   "peerDependencies": {
-    "grunt-rev": "~0.1.0"
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-rev": "~0.1.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt": "~0.4.5"
   },
   "keywords": [
     "gruntplugin"

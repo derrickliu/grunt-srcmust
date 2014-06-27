@@ -7,30 +7,41 @@
  */
 
 'use strict';
-var fs = require('fs');
+var fs = require('fs'),
+  path = require('path'),
+  crypto = require('crypto');
 module.exports = function(grunt) {
+
+  function md5(filepath, algorithm, encoding) {
+    var hash = crypto.createHash(algorithm);
+    grunt.log.verbose.write('Hashing ' + filepath + '...');
+    hash.update(grunt.file.read(filepath));
+    return hash.digest(encoding);
+  }
 
   function replaceSrc(options,src){
     var dirfiles;
     var srcStr = grunt.file.read(src, 'utf8');
     if(options.jsdir){
       dirfiles = fs.readdirSync(options.jsdir);
-      srcStr = _replace(dirfiles,srcStr);
+      srcStr = _replace(options,dirfiles,options.jsdir,srcStr);
     }
     if(options.cssdir){
       dirfiles = fs.readdirSync(options.cssdir);
-      srcStr = _replace(dirfiles,srcStr);
+      srcStr = _replace(options,dirfiles,options.cssdir,srcStr);
     }
     if(options.imagesdir){
       dirfiles = fs.readdirSync(options.imagesdir);
-      srcStr = _replace(dirfiles,srcStr);
+      srcStr = _replace(options,dirfiles,options.imagesdir,srcStr);
     }
    
     return srcStr;
   }
 
-  function _replace(dirfiles,srcStr){
-    dirfiles.forEach(function(file){
+  function _replace(options,dirfiles,path,srcStr){
+
+    if(options.type === 'rename'){
+      dirfiles.forEach(function(file){
         var s = file.split('.');
         if(s[2] !== undefined){ 
             var fileName = s[1] + '.' + s[2];
@@ -38,7 +49,36 @@ module.exports = function(grunt) {
             srcStr = srcStr.replace(cifReg, file);
             grunt.log.writeln('src "' + fileName + '" replace with: "' + file + '"');
         }
-    });
+      });
+      
+
+      //clear md5
+      // dirfiles.forEach(function(file){
+      //   var cifReg = new RegExp('(\\w{8}\.)*' + file,'g');
+      //   srcStr = srcStr.replace(cifReg, file);
+      // });
+    }
+    else{
+      dirfiles.forEach(function(file){
+        var pathname = path + file;
+        var stat = fs.lstatSync(pathname);
+          if(!stat.isDirectory()){
+          var len =  options.length,
+            hash = md5(pathname, options.algorithm, 'hex'),
+            prefix = hash.slice(0, len),
+            cifReg = new RegExp(file + '(\\?\\w{'+ len +'})*' + '([\"\'])', 'g');
+
+            srcStr = srcStr.replace(cifReg, file + '?' + prefix + '$2');
+            grunt.log.write(file + ' ').ok(file + '?' + prefix);
+          } 
+      });     
+
+      //clear md5
+      // dirfiles.forEach(function(file){
+      //   var cifReg = new RegExp(file + '(\\?\\w{8})*','g');
+      //   srcStr = srcStr.replace(cifReg, file);
+      // });
+    }
     return srcStr;
   }
 
@@ -48,9 +88,12 @@ module.exports = function(grunt) {
   grunt.registerMultiTask('srcmust', 'resource in page cache control', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
-        jsdir: '',
-        cssdir: '',
-        imagesdir: ''
+      jsdir: '',
+      cssdir: '',
+      imagesdir: '',
+      algorithm: 'md5',
+      length: 8,
+      type: 'rename'
     });
 
     // Iterate over all specified file groups.
