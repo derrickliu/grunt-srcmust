@@ -22,6 +22,10 @@ module.exports = function(grunt) {
   function replaceSrc(options,src){
     var dirfiles;
     var srcStr = grunt.file.read(src, 'utf8');
+    options.dirs.forEach(function(dir){
+      dirfiles = fs.readdirSync(dir);
+      srcStr = _replace(options,dirfiles,dir,srcStr);
+    });
     if(options.jsdir){
       dirfiles = fs.readdirSync(options.jsdir);
       srcStr = _replace(options,dirfiles,options.jsdir,srcStr);
@@ -88,6 +92,7 @@ module.exports = function(grunt) {
   grunt.registerMultiTask('srcmust', 'resource in page cache control', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
+      dirs:'',
       jsdir: '',
       cssdir: '',
       imagesdir: '',

@@ -63,6 +63,12 @@ Default value: `rename`
 
 ##### 注意：如果type 不是rename 不需要依赖grunt-rev
 
+#### options.dirs
+Type: `Array`
+Default value: `[]`
+
+需要遍历的目录数组，推荐使用这个，后面的jsdir/cssdir/imagesdir为了兼容老版本
+
 #### options.jsdir
 Type: `String`
 Default value: `''`
