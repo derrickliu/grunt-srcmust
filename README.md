@@ -122,8 +122,8 @@ grunt.initConfig({
     },
     contact: {
       options: {
-        cssdir: 'release/css/',
-        jsdir: 'release/js/contact/'
+        dirs: ['release/css/', 'release/js/contact/'],
+        cssdir: 'release/css2/'
       },
       files: [
         {
