@@ -23,9 +23,16 @@ module.exports = function(grunt) {
     var dirfiles;
     var srcStr = grunt.file.read(src, 'utf8');
     if(options.dirs){
-      options.dirs.forEach(function(dir){
+      options.dirs.forEach(function(dir,index){
+
+        if(options.prev){
+          var tempPlaceholder = dir;
+          dir = options.prev + dir;
+        }
+
+
         dirfiles = fs.readdirSync(dir);
-        srcStr = _replace(options,dirfiles,dir,srcStr);
+        srcStr = _replace(options,dirfiles,dir,srcStr,tempPlaceholder);
       });
     }
     if(options.jsdir){
@@ -44,8 +51,8 @@ module.exports = function(grunt) {
     return srcStr;
   }
 
-  function _replace(options,dirfiles,path,srcStr){
-
+  function _replace(options,dirfiles,path,srcStr,tempPlaceholder){
+    var tp = tempPlaceholder || '';
     if(options.type === 'rename'){
       dirfiles.forEach(function(file){
         var s = file.split('.');
@@ -67,16 +74,20 @@ module.exports = function(grunt) {
     else{
       dirfiles.forEach(function(file){
         var pathname = path + file;
-        var stat = fs.lstatSync(pathname);
-          if(!stat.isDirectory()){
-          var len =  options.length,
-            hash = md5(pathname, options.algorithm, 'hex'),
-            prefix = hash.slice(0, len),
-            cifReg = new RegExp(file + '(\\?\\w{'+ len +'})*' + '([\"\'])', 'g');
 
-            srcStr = srcStr.replace(cifReg, file + '?' + prefix + '$2');
-            grunt.log.write(file + ' ').ok(file + '?' + prefix);
-          } 
+        var stat = fs.lstatSync(pathname);
+        if(!stat.isDirectory()){
+        var len =  options.length,
+          hash = md5(pathname, options.algorithm, 'hex'),
+          prefix = hash.slice(0, len),
+          cifReg = new RegExp(tp + file + '(\\?\\w{'+ len +'})*' + '([\"\'])', 'g');
+
+          if(cifReg.test(srcStr)){
+            srcStr = srcStr.replace(cifReg, tp + file + '?' + prefix + '$2');
+            grunt.log.write(tp + file + ' ').ok(tp + file + '?' + prefix);
+          }
+          
+        } 
       });     
 
       //clear md5
@@ -95,6 +106,11 @@ module.exports = function(grunt) {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
       dirs:'',
+      //配合dirs使用，表似乎dirs路径的前缀
+      //使用场景：
+      //有a,b,c,...,h,i等模块，每个下面几乎都有一个view.js，如果需要做版本控制，
+      //可以这样配置options: { prev: 'js/', dirs: ['a/view.js','b/view.js',...,h/view.js,i/view.js]}
+      prev: '', 
       jsdir: '',
       cssdir: '',
       imagesdir: '',

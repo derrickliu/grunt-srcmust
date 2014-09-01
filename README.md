@@ -69,6 +69,12 @@ Default value: `[]`
 
 需要遍历的目录数组，推荐使用这个，后面的jsdir/cssdir/imagesdir为了兼容老版本
 
+#### options.prev
+Type: 'String'
+Default value: ''
+
+引入这个属性是为了解决不同文件夹下的名字相同文件版本控制问题，搭配dirs使用
+
 #### options.jsdir
 Type: `String`
 Default value: `''`
@@ -127,7 +133,32 @@ grunt.initConfig({
       },
       files: [
         {
-          src: 'pim/contact.jsp'
+          src: 'page/main.jsp'
+        }
+      ]
+    }
+  },
+});
+```
+
+新增属性prev的使用方法:
+使用场景：
+有a,b,c,...,h,i等模块，每个下面几乎都有一个view.js，如果需要做版本控制，
+可以这样配置options: { prev: 'js/', dirs: ['a/view.js','b/view.js',...,h/view.js,i/view.js]}
+```js
+grunt.initConfig({
+  srcmust: {
+    options: {
+      prev: 'v' //全局设置更改方式，rename或加版本
+    },
+    contact: {
+      options: {
+        prev: 'release/js/',
+        dirs: ['a/view.js', 'b/view.js', 'c/view.js'],
+      },
+      files: [
+        {
+          src: 'page/main.jsp'
         }
       ]
     }
