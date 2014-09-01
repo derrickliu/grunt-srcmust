@@ -142,7 +142,11 @@ grunt.initConfig({
 ```
 
 新增属性prev的使用方法:
+
 使用场景：
+
+控制按需加载模块的版本，比如requirejs下的场景：
+
 有a,b,c,...,h,i等模块，每个下面几乎都有一个view.js，如果需要做版本控制，
 可以这样配置options: { prev: 'js/', dirs: ['a/view.js','b/view.js',...,h/view.js,i/view.js]}
 ```js
@@ -163,6 +167,26 @@ grunt.initConfig({
       ]
     }
   },
+});
+
+//页面部分的js
+require.config({
+  baseUrl: 'release/js/'
+  paths: {
+    'a/view': 'a/view.js',
+    'b/view': 'b/view.js',
+    'c/view': 'c/view.js'
+  }
+});
+
+//grunt之后
+require.config({
+  baseUrl: 'release/js/'
+  paths: {
+    'a/view': 'a/view.js?11111111',
+    'b/view': 'b/view.js?22222222',
+    'c/view': 'c/view.js?33333333'
+  }
 });
 ```
 
