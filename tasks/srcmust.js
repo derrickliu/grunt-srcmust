@@ -80,7 +80,7 @@ module.exports = function(grunt) {
         var len =  options.length,
           hash = md5(pathname, options.algorithm, 'hex'),
           prefix = hash.slice(0, len),
-          cifReg = new RegExp(tp + file + '(\\?\\w{'+ len +'})*' + '([\"\'])', 'g');
+          cifReg = new RegExp(tp + file + '(\\?\\w{'+ len +'})*' + '([\"\']?)', 'g');
 
           if(cifReg.test(srcStr)){
             srcStr = srcStr.replace(cifReg, tp + file + '?' + prefix + '$2');
